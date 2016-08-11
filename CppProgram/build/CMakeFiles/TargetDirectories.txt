@@ -1,0 +1,2 @@
+/home/odermy/Desktop/learningTrajectories/CppProgram/build/CMakeFiles/recordTrajectoriesWithiCub.dir
+/home/odermy/Desktop/learningTrajectories/CppProgram/build/CMakeFiles/replayTrajectories.dir
