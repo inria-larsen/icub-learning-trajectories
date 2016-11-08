@@ -30,6 +30,7 @@ B. You can learn the distribution of your trajectories. For example:
 3. Launch proMPs_withPhasis.m on Matlab. It will compute the distribution of your trajectories. This programm will wait with the message "Please connect to a bottle sink (e.g. yarp read) and press a button."   
 4. At this moment launch gazebo (with the worldPROMPS.sdf if you have done movement from this world:   
 gazebo -slibgazebo_yarp_clock.so worldPROMPS.sdf   
+4.b.(new) use the command:  wholeBodyDynamicsTree --autoconnect --robot icubGazeboSim
 5. use the command: simCartesianControl --robot icubGazeboSim (from the path where the .ini linked to gazebo are)   
 6. Use the command:  iKinCartesianSolver --robot icubGazeboSim --part left_arm (from the path where the .ini linked to gazebo are)   
 7. Launch the programm replayTrajectories in ./CppProgram/build/bin   
