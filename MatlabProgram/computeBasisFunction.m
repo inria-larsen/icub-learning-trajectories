@@ -11,7 +11,7 @@ function PSI = computeBasisFunction(z,nbFunctions,alpha, totalTime, h)
         ci2(i) = 0.05*(i-1);%*alpha; 
     end
 
-    for t=1:z / alpha
+    for t=1:totalTime %z / alpha
         %creating a basis functions model (time*nbFunctions)
         for i = 1 : nbFunctions(1)
             val = -(alpha*t*0.01-ci(i))*(alpha*t*0.01-ci(i))/(2*h);
@@ -23,7 +23,7 @@ function PSI = computeBasisFunction(z,nbFunctions,alpha, totalTime, h)
             phi(t,i) = basis(t,i) / sumBI;
         end
     end
-    for t =1 : z / alpha 
+    for t =1 : totalTime %z / alpha 
         %creating a basis function model for forces, the same as for movements but with M functions
         for i = 1 : nbFunctions(2)
             val = -(alpha*t*0.01-ci2(i))*(alpha*t*0.01-ci2(i))/(h);
