@@ -10,6 +10,8 @@ accuracy = 0.00001;
 trial = input('Give the test you want to do (1, 2, 3)\n');
 disp(['we try the number ', num2str(trial)])
 
+%begin to play the first nbFirstData
+replayRecognitionNbData;
 %computation of the loglikelihood for each trajectory using only cartesian
 %coordinates
 
@@ -22,7 +24,7 @@ end
 
 % we compute for each learned distribution the loglikelihood that this
 % movement correspond to the distribution
-reco = {0 , 0.0 };
+reco = {0 , -Inf };
 for i=1:nbKindOfTraj
     %matrix of cartesian basis functions that correspond to the first nbData 
     PSI_coor{i} = computeBasisCoord(z,nbFunctions(1),mu_alpha(i), floor(z/mu_alpha(i)), h, nbData);
@@ -35,8 +37,10 @@ for i=1:nbKindOfTraj
     %we retrieve the learned trajectory of cartesian position
     u{i} = PSI_coor{i}*mu_w_coord{i};
     sigma{i} = PSI_coor{i}*sigma_w_coord{i}*PSI_coor{i}' + accuracy*eye(size(PSI_coor{i}*sigma_w_coord{i}*PSI_coor{i}'));
+    
+    %TODO a changer!!!
     %we compute the probability it correspond to the actual trial
-    prob{i}= my_log_mvnpdf(y_trial{trial}',u{i}',sigma{i});
+    prob{i}= - mean(abs(y_trial{trial} -u{i})) %my_log_mvnpdf(y_trial{trial}',u{i}',sigma{i});
     
     %we record the max of probability to know wich distribution we
     %recognize
@@ -65,20 +69,20 @@ y_trial_nbData = [y_trial{trial} ; PSI_forces{reco{1}}*mu_w_f{reco{1}}];
 
 %we aren't suppose to know "realData",  it is only used to draw the real
 %trajectory of the sample if we continue it to the end
-realAlpha = z /totalTimeTrial(reco{1});
+realAlpha = z /totalTimeTrial(trial);
 display(['The real alpha is ', num2str(realAlpha), ' with total time : ', num2str(totalTimeTrial(reco{1})) ])
 display(['The supposed alpha is ', num2str(mu_alpha(reco{1})), ' with total time : ', num2str(z / mu_alpha(reco{1})) ])
 
-% %Plot the total trial and the data we have
-% nameFig = figure;
-% for t=1:nbData
-%     i=1;
-%     %for i=1:nbDof(1) 
-%        nameFig(t) = scatter(t*realAlpha, y_trial_nbData((i-1)*nbData + t), '.b'); hold on;
-%       
-%     %end
-% end
-% nameFig = visualisation2(y_trial_Tot{reco{1}}, 1, totalTimeTrial(reco{1}), ':b', realAlpha, nameFig, size(nameFig,2));
+%Plot the total trial and the data we have
+nameFig = figure;
+for t=1:nbData
+    i=1;
+    %for i=1:nbDof(1) 
+       nameFig(t) = scatter(t*realAlpha, y_trial_nbData((i-1)*nbData + t), '.b'); hold on;
+      
+    %end
+end
+visualisation2(y_trial_Tot{trial},sum(nbDof), totalTimeTrial(trial),1, ':b', realAlpha, nameFig);
 
 %we need to have the psi matrix and vector value according to time to
 %update the distribution (just a rewriting of data to simplify the next
@@ -99,16 +103,26 @@ for t=1:nbData
 end
 
 
-% %draw the infered movement
-% i = reco{1};
-% nameFig = visualisation(PSI_z*mu_new, 1, z, 'g', nameFig, size(nameFig,2));
-% nameFig = visualisation(PSI_z*mu_w{i}, 1, z, 'r', nameFig, size(nameFig,2));
-% nameFig = visualisation(PSI_z*(mu_w{i} + 1.96*sqrt(diag(sigma_w{i}))), 1, z, '-.r', nameFig, size(nameFig,2));
-% nameFig = visualisation(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), 1, z, '-.r', nameFig, size(nameFig,2));
-% legend(nameFig([1 (nbData+1) (nbData +2) (nbData +3) ]),'Data known', 'Data we should have', 'Data deducted', 'Learned distribution');
-% 
-% title(['Recognition of the trajectory number ', num2str(trial) ,' (plot x cartesian position only)'])
-% xlabel('Iterations');
-% ylabel('x cartesian position (m)');
+%draw the infered movement
+i = reco{1};
+nameFig = visualisation(PSI_z*mu_new, sum(nbDof), z, 1,'g', nameFig);
+nameFig = visualisation(PSI_z*mu_w{i}, sum(nbDof), z, 1, 'r', nameFig);
+nameFig = visualisation(PSI_z*(mu_w{i} + 1.96*sqrt(diag(sigma_w{i}))), sum(nbDof), z, 1, '-.r', nameFig);
+nameFig = visualisation(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), sum(nbDof), z, 1, '-.r', nameFig);
+if(i~=1)
+    nameFig = visualisation(PSI_z*mu_w{1}, sum(nbDof), z, 1, 'k', nameFig);
+end
+if(i ~=2)
+    nameFig = visualisation(PSI_z*mu_w{2}, sum(nbDof), z, 1, 'k', nameFig);
+end
+if(i ~=3)
+    nameFig = visualisation(PSI_z*mu_w{3}, sum(nbDof), z, 1, 'k', nameFig);
+end
+
+
+
+title(['Recognition of the trajectory number ', num2str(trial) ,' (plot x cartesian position only)'])
+xlabel('Iterations');
+ylabel('x cartesian position (m)');
 
 replayRecognition;
