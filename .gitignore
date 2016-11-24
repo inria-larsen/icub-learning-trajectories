@@ -1,0 +1,13 @@
+*.png
+*.mp3
+*.mp4
+*.jpeg
+*.fig
+*image*
+*~
+*.svg
+*.pdf
+*.o
+*corbeille*
+CppProgram/build/
+CppProgram/CMakeLists.txt
