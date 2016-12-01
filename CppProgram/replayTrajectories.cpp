@@ -282,15 +282,16 @@ public:
 				{
 					client.setTrajectoryTime(3.0);
 					if(verbositylevel == 1) cout << "Rythme slow to begin the movement" << endl;
-					//TODO goToPoseSync would be better but the program is blocked here.
+					//doesn't work with icubGazebo
 					//client.goToPoseSync(xd,od);   // send request and wait for reply
 					client.goToPose(xd,od);
 					//client.waitMotionDone(0.04);  // wait until the motion is done and ping at each 0.04 seconds
 					firstTime = false;
 				}else
 				{
-					client.setTrajectoryTime(0.1);
+					client.setTrajectoryTime(0.5);
 					client.goToPose(xd,od); // new target is xd,od
+					//client.waitMotionDone(0.004);
 				}
 				
 				client.getPose(x,o); // get current pose as x,o

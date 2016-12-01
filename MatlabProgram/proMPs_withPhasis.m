@@ -10,7 +10,7 @@ nbFunctions(1) = 11; %number of basis functions
 nbFunctions(2) = 21; %number of basis functions for forces
 nbDof(1) = 3; %number of degree of freedom
 nbDof(2) = 3; %number of forces
-nbData = 30;%floor(2*z /3); %number of data before trying to find the correct movement
+nbData = 40;%floor(2*z /3); %number of data before trying to find the correct movement
 
 %Launch that only if you want to test it onto gazebo
 %port open: port(/matlab/write)
@@ -53,5 +53,5 @@ replay;
 
 %Recognition of the movement
 recognitionTrajectory;
-
+%reco22nov
 closeConnection;

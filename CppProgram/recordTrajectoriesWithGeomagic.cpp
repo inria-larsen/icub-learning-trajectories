@@ -259,7 +259,6 @@ public:
 		
 		else if(flagReplay == 1) // if the button replay is pushed
 		{
-			
 			cout << "Replay. Time step = " << nbTimeStep << endl;
 
 			xd[0] = fx[nbReplay][nbTimeStep];
@@ -267,21 +266,21 @@ public:
 			xd[2] = fz[nbReplay][nbTimeStep];	
 			nbTimeStep++;
 			
+			// the sync don't work with icubSim
 			client.goToPose(xd,od); // new target is xd,od
+			//client.waitMotionDone(0.04);
 			client.getPose(x,o);
 			igeo->getPosition(pos);
-			int wait;
 			double distance= ((x[0] - pos[0])*(x[0] - pos[0]) + (x[1] - pos[1])*(x[1] - pos[1]) + (x[2] - pos[2])*(x[2] - pos[2]));
 			while(distance > 0.001)
 			{
-				
 				cout << "Distance =" << distance << endl;
 			    yInfo("Sim position    = (%s)",x.toString(3,3).c_str());
 				yInfo("Haptic position = (%s)", pos.toString(3,3).c_str());
 				feedback=yarp::math::operator*(yarp::math::operator-(x,pos), 45.0); //(x-xd)*45.0; 
 
 				
-				//yInfo("Feedback              = (%s)", feedback.toString(3,3).c_str());
+				yInfo("Feedback = (%s)", feedback.toString(3,3).c_str());
 				verifyFeedback(); 
 				yInfo("Feedback = (%s)", feedback.toString(3,3).c_str());
 
@@ -289,8 +288,6 @@ public:
 				igeo->getPosition(pos);
 				client.getPose(x,o);
 				distance= ((x[0] - pos[0])*(x[0] - pos[0]) + (x[1] - pos[1])*(x[1] - pos[1]) + (x[2] - pos[2])*(x[2] - pos[2]));
-			
-				
 			}
 			if (nbTimeStep >= fx[0].size())
 			{

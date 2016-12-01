@@ -5,7 +5,7 @@ data_max = PSI_z*(mu_new + 1.96*sqrt(diag(sigma_new)));
 data_min = PSI_z*(mu_new - 1.96*sqrt(diag(sigma_new)));
 compliance = 0.0;
 
-for t = 1 : z
+for t = round(mu_alpha(reco{1})*nbData): z
     b.clear();
     for i = 1 : nbDof(1) %+ nbDof(2)
         val(t,i) = data(z*(i-1)+t);
@@ -15,9 +15,7 @@ for t = 1 : z
     b.addDouble(compliance);
     
     port.write(b);
-    
-    
-  %  disp('Have send the message.');
+    %disp('Have send the message.');
     port.read(c);
     disp(c);
     num = str2num(c);

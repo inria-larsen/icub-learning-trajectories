@@ -40,4 +40,4 @@ gazebo -slibgazebo_yarp_clock.so worldPROMPS.sdf
 ## Actual development (V2)
 In this version, we began to implement the code to be launch on the real iCub.   
 We take into account information about external forces.   
-We just need to be able to modify the ocmpliance of the robot arm to finish this work.   
+We just need to be able to modify the compliance of the robot arm to finish this work.   

@@ -1,10 +1,11 @@
 %in this function, we try to recongize a movement from the 30 first data
-%and to complete it.
+%and to complete it. We recogniz and modify only the position information 
 %TO do that, we consider the phasis of the movement as the mean of the
 %phasis used during the learning.
 
+
 %variable tuned to achieve the trajectory correctly
-accuracy = 0.00001;
+accuracy = 0.00000000001;
 
 %accuracy that we want : choose randomly
 trial = input('Give the test you want to do (1, 2, 3)\n');
@@ -12,6 +13,7 @@ disp(['we try the number ', num2str(trial)])
 
 %begin to play the first nbFirstData
 replayRecognitionNbData;
+
 %computation of the loglikelihood for each trajectory using only cartesian
 %coordinates
 
@@ -59,13 +61,14 @@ end
 disp(['The recognize trajectory is the number ', num2str(reco{1})])
 
 %we retrieve the computed distribution that correspond to the recognized
-%trajctory
-mu_new = mu_w{reco{1}};
-sigma_new = sigma_w{reco{1}}; 
+%trajectory
+%22 nov change: coord only
+mu_new = mu_w_coord{reco{1}};
+sigma_new = sigma_w_coord{reco{1}}; 
 
 %we complete the data with the supposed forces correlated to the movement
 %according to the learned trajectory
-y_trial_nbData = [y_trial{trial} ; PSI_forces{reco{1}}*mu_w_f{reco{1}}];
+y_trial_nbData = y_trial{trial};%[y_trial{trial} ; PSI_forces{reco{1}}*mu_w_f{reco{1}}];
 
 %we aren't suppose to know "realData",  it is only used to draw the real
 %trajectory of the sample if we continue it to the end
@@ -88,8 +91,9 @@ visualisation2(y_trial_Tot{trial},sum(nbDof), totalTimeTrial(trial),reco{1}, ':b
 %update the distribution (just a rewriting of data to simplify the next
 %computation.
 for t=1:nbData
-    for i=1: nbDof(1) + nbDof(2)
-        PSI_update{t}(i,:) = PSI_mean{reco{1}}(t + nbData*(i-1),:);
+%22 nov change: coord only
+    for i=1: nbDof(1) %+ nbDof(2)
+        PSI_update{t}(i,:) = PSI_mean{reco{1}}(t + nbData*(i-1),1:nbDof(1)*nbFunctions(1));
         ynew{t}(i) = y_trial_nbData(t + nbData*(i-1)) ;
     end
 end
@@ -101,6 +105,15 @@ for t=1:nbData
     mu_new = mu_new + K* (ynew{t}' - PSI_update{t}*mu_new);
     sigma_new = sigma_new - K*(PSI_update{t}*sigma_new);
 end
+
+
+%22 nov change: coord only
+tmp = mu_new;
+tmp2 =sigma_new;
+mu_new= [tmp; mu_w_f{reco{1}}]
+RT = sigma_w{reco{1}}(1:nbDof(1)*nbFunctions(1),nbDof(1)*nbFunctions(1)+1: nbDof(1)*nbFunctions(1) +  nbDof(2)*nbFunctions(2))
+Bottm = sigma_w{reco{1}}(nbDof(1)*nbFunctions(1)+1 :  nbDof(1)*nbFunctions(1) +  nbDof(2)*nbFunctions(2),:);
+sigma_new = [tmp2, RT; Bottm];
 
 
 %draw the infered movement
@@ -125,4 +138,4 @@ title(['Recognition of the trajectory number ', num2str(trial) ,' (plot only one
 xlabel('Iterations');
 ylabel('x cartesian position (m)');
 
-replayRecognition;
+replayRecognition22nov;

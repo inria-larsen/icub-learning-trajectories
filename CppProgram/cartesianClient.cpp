@@ -24,7 +24,6 @@ bool CartesianClient::init(const string &robot,const string & part,bool swap_x, 
 
     client.view(icart);
     icart->storeContext(&startup_context_id);
-    
     // get the torso dofs
     Vector newDof, curDof;
     icart->getDOF(curDof);

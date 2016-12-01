@@ -189,7 +189,7 @@ public:
 				cout << "End of the recorded trajectory." << endl;
 				client.setTrajectoryTime(3.0);
 				client.goToPose(xinit,od); // new target is xd,od
-				client.setTrajectoryTime(0.1);
+				client.setTrajectoryTime(0.5);
 				if(verbositylevel == 1) cout << "Rythme slow to replace the arm." << endl;
 				fx.push_back(ftx);
 				fy.push_back(fty);
@@ -266,7 +266,7 @@ public:
 				//client.goToPoseSync(xinit,od); // new target is xd,od
 				client.goToPose(xinit,od);   // send request and wait for reply
 			//	client.waitMotionDone(0.04);
-				client.setTrajectoryTime(0.1);
+				client.setTrajectoryTime(0.5);
 				nbTimeStep = 0;
 				flagReplay = 0;
 			}
