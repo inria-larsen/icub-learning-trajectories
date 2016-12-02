@@ -10,4 +10,3 @@
 *.o
 *corbeille*
 CppProgram/build/
-CppProgram/CMakeLists.txt

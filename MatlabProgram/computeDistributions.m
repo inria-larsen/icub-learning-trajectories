@@ -29,7 +29,7 @@ for i = 1 : nbKindOfTraj
 
    % Plot the learned distribution for the x cartesian position of the
    % trajectory i
-   %nf = figure;         
+   nf = figure;         
    nf = visualisationShared(PSI_z*mu_w{i},PSI_z*1.96*sqrt(diag(sigma_w{i})), sum(nbDof), z, i, 'r', nf);hold on
    nf = visualisation(PSI_z*(mu_w{i}),sum(nbDof), z, i, 'r', nf);
   % nf = visualisation(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), sum(nbDof), z, i,'-.r', nf);
