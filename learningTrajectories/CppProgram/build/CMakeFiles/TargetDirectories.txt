@@ -1,0 +1,4 @@
+/home/odermy/Desktop/meeting_test/icub-learning-trajectories/learningTrajectories/CppProgram/build/CMakeFiles/fake_geomagic_driver.dir
+/home/odermy/Desktop/meeting_test/icub-learning-trajectories/learningTrajectories/CppProgram/build/CMakeFiles/recordTrajectories.dir
+/home/odermy/Desktop/meeting_test/icub-learning-trajectories/learningTrajectories/CppProgram/build/CMakeFiles/replayTrajectories.dir
+/home/odermy/Desktop/meeting_test/icub-learning-trajectories/learningTrajectories/CppProgram/build/CMakeFiles/test_simple.dir

@@ -1,0 +1,2 @@
+/usr/bin/ar cr lib/libfake_geomagic_driver.a  CMakeFiles/fake_geomagic_driver.dir/fakeGeomagicDriver.cpp.o
+/usr/bin/ranlib lib/libfake_geomagic_driver.a
