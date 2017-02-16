@@ -8,7 +8,7 @@ project(learningTrajectories)
 find_package(YARP         REQUIRED)
 find_package(ICUBcontrib  REQUIRED)
 find_package(hapticdevice REQUIRED)
-find_package(gazebo REQUIRED)
+#find_package(gazebo REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
@@ -26,9 +26,9 @@ target_link_libraries(fake_geomagic_driver ${YARP_LIBRARIES}  )
 add_definitions(-D_USE_MATH_DEFINES)
 
 
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
+#include_directories(${GAZEBO_INCLUDE_DIRS})
+#link_directories(${GAZEBO_LIBRARY_DIRS})
+#list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 #add_executable(test_simple test_simple.cpp cartesianClient.cpp)
 #target_link_libraries(test_simple ${YARP_LIBRARIES} pthread fake_geomagic_driver)
