@@ -3,7 +3,7 @@
 
 If you have some question, remarks etc, send an email to oriane.dermy@inria.fr.
 
-***WARNING: this program is under developpment, do not launch it now without verify it.***
+***WARNING: the  ICUB recording program is under developpment, do not launch it now without verify it.***
 
 ## PRE-INSTALLATION:
 You need to have installed the geomagic touch (and of course gazebo, yarp, and so on).

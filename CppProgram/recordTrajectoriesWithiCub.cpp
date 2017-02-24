@@ -24,6 +24,10 @@
  * Moreother the orientation of the arm is corrected to be natural.
  * 
  */
+ 
+ 
+ /// WARNING: THIS FUNCTION IS IN DEVELOPMENT, DO NOT USE IT WITHOUT VERIFY
+ 
 
 #include <cmath>
 #include <string>
