@@ -14,12 +14,12 @@ end
 if(isa(col1, 'char'))
     %for i=1:x
      i=z;
-       nameFig(tall + 1) = plot(val(i,:), col1); hold on;
+       nameFig(tall + 1) = plot(val(i,:), col1,'linewidth',2); hold on;
     %end
 else
     %for i=1:x 
      i=z;
-      nameFig(tall + 1) = plot(val(i,:), 'Color', col1); hold on;
+      nameFig(tall + 1) = plot(val(i,:), 'Color', col1,'linewidth',2); hold on;
     %end
 end
  y = nameFig;

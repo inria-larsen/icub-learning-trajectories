@@ -2,7 +2,7 @@
 % matrix, y the number of colonnes, bool=1 if we want forces, 0 if we want
 % cartesian position, col1 is the color of the fig, nameFig is the fig
 
-function y = visualisation3D2(matrix, x, y, bool, col1, alpha, nameFig)
+function y = visualisation3D2(matrix, , y, type, col1, alpha, nameFig)
 
 tall= size(nameFig,2);
 
@@ -12,20 +12,17 @@ for i=1:x
     end
 end
 
-if(bool==0)%if we want to plot the coordinate
-    if(isa(col1, 'char'))
-           nameFig(tall + 1 ) = plot3(val(1,:), val(2,:),val(3,:), col1); hold on;
-    else
-          nameFig(tall+ 1) = plot3( val(1,:), val(2,:),val(3,:), 'Color', col1); hold on;
-    end
-else
-    if(isa(col1, 'char'))
-           nameFig(tall + 1 ) = plot3( val(4,:) ,val(5,:),val(6,:), col1); hold on;
-    else
-          nameFig(tall+ 1) = plot3( val(4,:) ,val(5,:),val(6,:), 'Color', col1); hold on;
-    end
+nb=0;
+for cpt =1:type-1
+    nb = nb + nbDof(cpt);
 end
+sizeV = size(val, 2);
 
+    if(isa(col1, 'char'))
+           nameFig(tall + 1 ) = plot3(val(nb + 1,1:alpha:sizeV), val(nb + 2,1:alpha:sizeV),val(nb + 3,1:alpha:sizeV), col1); hold on;
+    else
+          nameFig(tall+ 1) = plot3( val(nb + 1,1:alpha:sizeV), val(nb + 2,1:alpha:sizeV),val(nb + 3,1:alpha:sizeV), 'Color', col1); hold on;
+    end
 
  y = nameFig;
 end

@@ -4,292 +4,169 @@
 %phasis used during the learning.
 
 %variable tuned to achieve the trajectory correctly
-%accuracy = 0.000000001;
-accuracy = 0.00000005;
 
-%nbData = floor((mu_alpha(1) +mu_alpha(2) + mu_alpha(3))/0.03)
-nbData = 60;
-num= zeros(nbData,6);
-%AskForData
-b.clear();
-b.addString('request_data');
-b.addDouble(nbData);
-port.write(b);
-disp('Have send the message.');
-c.clear();
-port.read(c);
-disp(c);
-num2 = str2num(c);
-totalTimeTrial =(size(num2,2)/6);
-a = 1;
-v = [1/10 1/10 1/10 1/10 1/10 1/10 1/10 1/10 1/10 1/10];
-for(t=1:totalTimeTrial)
-    num(t,1) = num2(6*(t-1) + 1);
-    num(t,2) = num2(6*(t-1) + 2);
-    num(t,3) = num2(6*(t-1) + 3);
-    num(t,4) = num2(6*(t-1) + 4);
-    num(t,5) = num2(6*(t-1) + 5);
-    num(t,6) = num2(6*(t-1) + 6);
-    %disp(['Receiving: x = ', num2str(num(t,1)), ', y = ',num2str(num(t,2)), ', z = ', num2str(num(t,3)), 'fx = ', num2str(num(t,4)), ', fy = ',num2str(num(t,5)), ', fz = ', num2str(num(t,6)) ]);
-end
-
- y_trial = [num(1:nbData,1) ; num(1:nbData,2) ; num(1:nbData,3) ; filter(v,a,num(1:nbData,4)) ; filter(v,a,num(1:nbData,5)) ; filter(v,a,num(1:nbData,6))];
- y_trial_Tot = [num(:,1) ; num(:,2) ; num(:,3) ; filter(v,a,num(:,4)) ; filter(v,a,num(:,5)) ; filter(v,a,num(:,6))];
-
- 
- affich = 1;
-if(affich ==1) namePlot = ('x');
-elseif(affich ==2) namePlot = ('y');
-elseif(affich ==3) namePlot = ('z');
-elseif(affich ==4) namePlot = ('fx');
-elseif(affich ==5) namePlot = ('fy');
-else namePlot = ('fz');
-end
- % % Plot the trials we will use to verify the learning
-nm = figure;
-nm = visualisation(y_trial_Tot, 6, totalTimeTrial,affich, [1, 0, 0], nm);hold on;
-nm = visualisation(y_trial, 6, nbData,affich, '.r', nm);
-title('Trial trajectory');
-xlabel('Iterations');
-ylabel(namePlot);
-%plot 3D trials
-nam4 = figure;
-nam4 = visualisation3D(y_trial_Tot, 6, totalTimeTrial(1), 0, [1, 0, 0], nam4);
-nam4 = visualisation3D(y_trial, 3, nbData, 0, '.r', nam4);
-title('Trial trajectory');
-xlabel('x')
-ylabel('y')
-zlabel('z')
- 
+%accuracy that we want : choose randomly
+% text= ['Give the test you want to do (from 1 to ' num2str(nbKindOfTraj) ')'];
+% trial = input(text);
+% disp(['we try the number ', num2str(trial)])
+ accuracy=0.00000000000000001;
+%while(accuracy <= 0.1)
+ %pb ici
+%y_trial_Tot{1} = ymean{1};
+%totalTimeTrial(1) =100;% totalTime(1,5);
+trial=1;
 
 %computation of the loglikelihood for each trajectory using only cartesian
 %coordinates
+typeReco = 1; %what kind of dof we use for the reco{cpt}
+vr = 0;
+prevDof = 0;
+for j=1:typeReco-1
+    vr = vr + nbDof(j)*nbFunctions(j);
+    prevDof = prevDof + nbDof(j); 
 
+end
 %we cut the mu_w to correspond only to the cartesian position informaiton
 for i=1:nbKindOfTraj
-    mu_w_coord{i} = mu_w{i}(1:nbDof(1)*nbFunctions(1));
-    mu_w_f{i} = mu_w{i}(nbDof(1)*nbFunctions(1)+1:nbDof(1)*nbFunctions(1)+nbDof(2)*nbFunctions(2));
-    sigma_w_coord{i} = sigma_w{i}(1:nbDof(1)*nbFunctions(1),1:nbDof(1)*nbFunctions(1));
+    mu_w_reco{i} = mu_w{i}(vr + 1 : vr + nbDof(typeReco)*nbFunctions(typeReco));
+    sigma_w_reco{i} = sigma_w{i}(vr + 1 : nbDof(typeReco)*nbFunctions(typeReco),vr + 1:nbDof(typeReco)*nbFunctions(typeReco));
 end
+
 
 % we compute for each learned distribution the loglikelihood that this
 % movement correspond to the distribution
-reco = {0 , -Inf, 1};
 
-%% compute log_p(alpha) for a number of alphas
-n_alpha_samples = 50;
+%reco = cell(11,3);
+meanTime= floor((z / mu_alpha));
+cpt = 1;
 
-%% defining deterministically a number of alphas between the minimum and the maximum observed
-sampled_alphas = linspace(min_alpha, max_alpha, n_alpha_samples)';
 
-%%
-%log_p_alphas = log(mvnpdf(sampled_alphas,mu_alpha,Sigma_alpha));
-%% mvnpdr retourne la densité de proba d'une distribution normal multivariable avec centre mu_alpha, et cov sigma_alpha
 
-for k=1:50
+%psiTrial = computeBasisFunction(z,nbFunctions, nbDof, mu_alpha(1), floor(z/mu_alpha(1)), center_gaussian, h,totalTimeTrial(trial));
+%for step=1:floor(meanTimeDiv2/10):meanTimeDiv2
+
+for step=1: floor(totalTimeTrial(1) /10): totalTimeTrial(1)
+    reco{cpt} = [0.0 , 0.0, 0.0 ];
     for i=1:nbKindOfTraj
-        %matrix of cartesian basis functions that correspond to the first nbData 
-        PSI_coor{k}{i} = computeBasisCoord(z,nbFunctions(1),sampled_alphas(k), floor(z/sampled_alphas(k)), h, nbData);
-        %matrix of forces basis functions that correspond to the first nbData
-        PSI_forces{k}{i} = computeBasisForces(z,nbFunctions(2),sampled_alphas(k), floor(z/sampled_alphas(k)), h, nbData);
+        cpt
+        %matrix of basis functions that correspond to the first nbData for
+        %the DOF taked into account for the recognition
+        PSI_reco{step}{i} = computeBasisFunction(z,nbFunctions(typeReco), nbDof(typeReco), mu_alpha(i), floor(z/mu_alpha(i)), center_gaussian(typeReco), h(typeReco),step);
         %matrix of basis functions for all data that correspond to the first
         %nbData
-        PSI_mean{k}{i} = blkdiag(PSI_coor{k}{i},PSI_forces{k}{i});
+        PSI_tot{step}{i} = computeBasisFunction(z,nbFunctions, nbDof, mu_alpha(i), floor(z/mu_alpha(i)), center_gaussian, h,step);
 
         %we retrieve the learned trajectory of cartesian position
-        u{k}{i} = PSI_coor{k}{i}*mu_w_coord{i};
-        sigma{k}{i} = PSI_coor{k}{i}*sigma_w_coord{i}*PSI_coor{k}{i}' + accuracy*eye(size(PSI_coor{k}{i}*sigma_w_coord{i}*PSI_coor{k}{i}'));
+        u{step}{i} = PSI_reco{step}{i}*mu_w_reco{i};
+        sigma{step}{i} = PSI_reco{step}{i}*sigma_w_reco{i}*PSI_reco{step}{i}' + accuracy*eye(size(PSI_reco{step}{i}*sigma_w_reco{i}*PSI_reco{step}{i}'));
+        
         %we compute the probability it correspond to the actual trial
-        for j=10:nbData
-            prob{k}{i}(j)= my_log_mvnpdf([num(1:j,1) ; num(1:j,2) ; num(1:j,3)]',u{k}{i}(1:3*j)',sigma{k}{i}(1:3*j,1:3*j));
+        y_trial_part{step} = [];
+        for k=1:nbDof(typeReco)
+           y_trial_part{step} = [y_trial_part{step} ; y_trial_Tot{trial}(totalTimeTrial(trial)*(prevDof+k -1) + 1 : totalTimeTrial(trial)*(prevDof+k -1) + step)];
         end
-      
+        prob(i,cpt)= logLikelihood(y_trial_part{step}',u{step}{i}',sigma{step}{i})
+
         %we record the max of probability to know wich distribution we
         %recognize
-        [ prob1, indx ] = max(prob{k}{i});
-       
-        if(prob1 > reco{2})
-            reco{2} = prob1;
-            reco{1} = i;
-            reco{3} = k;
-        end
+    %    if(prob(i,step) > reco{cpt}(2))
+            reco{cpt}(2) = prob(i,cpt);
+            reco{cpt}(1) = i;
+            reco{cpt}(3) = step;
+     %   end
 
-    %     figure;
-    %     visualisation(u{i}, 1, nbData, 'r');
-    %     visualisation(u{i} + 1.96*sqrt(diag(sigma{i})), 1, nbData, ':r');
-    %     visualisation(u{i} - 1.96*sqrt(diag(sigma{i})), 1, nbData, ':r');
-    %     visualisation(y_trial{trial}, 1, nbData, 'b');
     end
-end
 
-quit = 0;
-disp ''
-disp(['The recognize trajectory is the number ', num2str(reco{1}), ' with p= ', num2str(reco{2}) ' and alpha= ', num2str(sampled_alphas(reco{3}))])
-realAlpha = z /totalTimeTrial;
-display(['The real alpha is ', num2str(realAlpha), ' with total time : ', num2str(totalTimeTrial) ])
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %plot 3D data
-    nam2 = figure;
-    for i=1:var(1)
-        nam2 = visualisation3D(y{1}{i}, 6, totalTime(1,i), 0, [1, 0, 0], nam2);
-    end
-    for i=1:var(2)
-        nam2 = visualisation3D(y{2}{i}, 6, totalTime(2,i), 0,[0, 0, 1], nam2);
-    end
-    for i=1:var(3)
-        nam2 = visualisation3D(y{3}{i}, 6, totalTime(3,i),0,[0, 1, 0], nam2);
-    end
-    nam2 = visualisation3D(y_trial, 3, nbData, 0, 'v', nam2);
-    nam2 = visualisation3D(y_trial_Tot, 3, totalTimeTrial, 0, ':', nam2);
+    disp(['The recognize trajectory is the number ', num2str(reco{cpt}(1))])
 
-    title('Trajectories used to learn')
-    xlabel('x')
-    ylabel('y')
-    zlabel('z')
-    legend(nam2([2 (var(1)+2) (var(1) + var(2) + 2)]),'Right','Ahead','Top');
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if(reco{1} ==0) % if we don't recognizz the movement
-    disp('We dont recognize the movement');
-    msg = input('Send q to quit\n', 's');
-    b.clear();
-    b.addDouble(0.0)
-    port.write(b);
-    if(msg == 'q')
-         disp('End of the programm.');  
-    else
-        clear mu_w_coord mu_w_f sigma_w_coord PSI_coor PSI_forces PSI_mean u sigma prob reco mu_n sigma_n y_trial realAlpha PSI_update ynew K mu_new sigma_new
-        inference;
-    end
-else %if we recognize the movemet
     %we retrieve the computed distribution that correspond to the recognized
     %trajctory
-    mu_new = mu_w{reco{1}};
-    sigma_new = sigma_w{reco{1}}; 
-
+    mu_new = mu_w{reco{cpt}(1)};
+    sigma_new = sigma_w{reco{cpt}(1)}; 
+    %logLikelihood( y_trial_Tot{trial}', mu_new', sigma_new) ;
     %we complete the data with the supposed forces correlated to the movement
     %according to the learned trajectory
-    %y_trial =y_trial{trial}; %[y_trial{trial} ; PSI_forces{reco{1}}*mu_w_f{reco{1}}];
 
-    %we suppose that the velocity of the movement is equal to the mean of
-    %the one learned
-    display(['alpha real: ', num2str(mu_alpha(reco{1})), ' totTimeTrial: ', num2str(z / mu_alpha(reco{1})) ])
-    totalTimeExpexted = z / sampled_alphas(reco{3});
-    display(['alpha_expected: ', num2str(sampled_alphas(reco{3})), ' totTime_exp: ', num2str(totalTimeExpexted) ])
 
-    
+    y_prev = [];
+    for i=1:prevDof
+        y_prev  = [y_prev ; y_trial_Tot{trial}(totalTimeTrial(trial)*(i -1) + 1 : totalTimeTrial(trial)*(i -1) + reco{cpt}(3))];
+    end
+
+    y_after = [];
+    for i= (1 + prevDof + nbDof(typeReco)): nbDofTot
+       y_after = [y_after;  y_trial_Tot{trial}(totalTimeTrial(trial)*(i -1) + 1 : totalTimeTrial(trial)*(i -1) + reco{cpt}(3))];   
+    end
+    %all data (all DOF) from t=1 to the time of inference
+    y_trial_nbData =[y_prev ; y_trial_part{reco{cpt}(3)}; y_after ];
+
+    %we aren't suppose to know "realData",  it is only used to draw the real
+    %trajectory of the sample if we continue it to the end
+    realAlpha = z /totalTimeTrial(reco{cpt}(1));
+ %   display(['The real alpha2 is ', num2str(realAlpha), ' with total time : ', num2str(totalTimeTrial(reco{cpt}(1))) ])
+ %   display(['The supposed alpha2 is ', num2str(mu_alpha(reco{cpt}(1))), ' with total time : ', num2str(z / mu_alpha(reco{cpt}(1))) ])
+
+
     %we need to have the psi matrix and vector value according to time to
     %update the distribution (just a rewriting of data to simplify the next
     %computation.
-    for t=1:nbData
-        for i=1: nbDof(1) %+ nbDof(2)
-            PSI_update{t}(i,:) = PSI_mean{reco{3}}{reco{1}}(t + nbData*(i-1),:);
-            ynew{t}(i) = y_trial(t + nbData*(i-1)) ;
+    vr=0;
+    for j=1:typeReco-1
+        vr = vr + nbDof(j);
+    end
+    for t=1:reco{cpt}(3)
+        for i=vr + 1: vr + nbDof(typeReco)
+            PSI_update{t}(i,:) = PSI_tot{reco{cpt}(3)}{reco{cpt}(1)}(t + reco{cpt}(3)*(i-1),:);
+            ynew{t}(i) = y_trial_nbData(t + reco{cpt}(3)*(i-1)) ;
         end
     end
-    
+
+%fig = figure(1)
+
+%filename = ['test', num2str(cpt), '.gif'];
     % compute the new distribution (we try to pass by via point that correspond
     % to the fist nbData, with an accuracy tuned at the begining)
-    for t=1:nbData     
+    for t=1:reco{cpt}(3)     
         K = sigma_new*PSI_update{t}' * inv(accuracy*eye(size(PSI_update{t}*sigma_new*PSI_update{t}')) + PSI_update{t}*sigma_new*PSI_update{t}');
         mu_new = mu_new + K* (ynew{t}' - PSI_update{t}*mu_new);
         sigma_new = sigma_new - K*(PSI_update{t}*sigma_new);
+%        if(step == totalTimeTrial(1)) 
+%        
+%         shadedErrorBar([1:1:100],PSI_z*mu_new, PSI_z*1.96*sqrt(diag(sigma_new)), 'g');
+%         end
+%         fig(size(fig,2)+1) = plot([1:1:100],PSI_z*mu_new,'g');
+%         fig =  visualisation2(y_trial_Tot{i}, nbDofTot, totalTimeTrial(i),1, '--magenta', realAlpha, fig);hold on;
+% 
+%          %visualisation2(y_trial_Tot{i}, nbDofTot, totalTimeTrial(i),type, '-.r', mu_alpha(i), nf3D);hold on;
+%          %legend(fig([(size(fig,2)-1) size(fig,2)]),'inference', 'real trajectory')
+%          drawnow
+%          
+%         frame = getframe(1);
+% 
+%         im = frame2im(frame);
+%          [imind,cm] = rgb2ind(im,256);
+%          if( t == 1)
+%               imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+%          else
+%              imwrite(imind,cm,filename,'gif','WriteMode','append');
+%          end
+       
+         %input('wait');
     end
 
-    clear PSI_update PSI_mean;
-    b.clear();
-    b.addString('send_data');
-    port.write(b);
-    
-    
-        % %%%%%%%%%%%%%%%%%%%%%%%%REPRESENTATION (plot)%%%%%%%%%%%%%%%
-        %Plot the total trial and the data we have
-    nameFig = figure;
-    i = reco{1};
-
-    for t=1:nbData
-           nameFig(t) = scatter(t*realAlpha, y_trial((i-1)*nbData + t), '.b'); hold on;       
-    end
-    nameFig = visualisation2(y_trial_Tot, 6, totalTimeTrial, i, ':b', realAlpha, nameFig);
-
-    %draw the infered movement
-    nameFig = visualisation(PSI_z*mu_new, 6, z, i, '+g', nameFig);
-    nameFig = visualisation(PSI_z*mu_w{i}, 6, z, i,'r', nameFig);
-    nameFig = visualisation(PSI_z*(mu_w{i} + 1.96*sqrt(diag(sigma_w{i}))), 6, z,i, '-.r', nameFig);
-    nameFig = visualisation(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), 6, z, i, '-.r', nameFig);
-    legend(nameFig([1 (nbData+1) (nbData +2) (nbData +3) ]),'Data known', 'Data we should have', 'Data deducted', 'Learned distribution');
-    trial = input('what movement have you tried? (1. left 2. ahead 3. top')
-    if(trial ==1)
-        name = 'right';
-        name2 = 'y cartesian position' ;
-    elseif(trial == 2)
-        name = 'ahead';
-        name2 = 'x cartesian position';
-    else
-        name= 'top';
-        name2 = 'z cartesian position';
-    end
-    title(['Position recognition of the ', name ,' trajectory ']);
-    xlabel('Iterations');
-    ylabel(name2);
-
-
-        %draw the infered movement 3D
-    name3D = figure;
-    for t=1:nbData
-           name3D(t) = scatter3(y_trial(t), y_trial(nbData + t), y_trial(2*nbData + t), '.b'); hold on;
-    end
-    name3D = visualisation3D(y_trial_Tot, 6, totalTimeTrial,0, ':b', name3D);hold on;
-    %nam4 = visualisation3D(y_trial_Tot{1}, 6, totalTimeTrial(1), 0, [1, 0, 0], nam4);
-
-
-    i = reco{1};
-    name3D = visualisation3D(PSI_z*mu_new, 6, z, 0, '+g', name3D);
-    name3D = visualisation3D(PSI_z*mu_w{i}, 6, z, 0, '.r', name3D);
-    name3D = visualisation3D(PSI_z*(mu_w{i} + 1.96*sqrt(diag(sigma_w{i}))), 6, z, 0, '-.r', name3D);
-    name3D = visualisation3D(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), 6, z, 0, '-.r', name3D);
-    legend(name3D([1 (nbData+1) (nbData +2) (nbData +3) ]),'Data known', 'Data we should have', 'Data deducted', 'Learned distribution');
-
-    if(trial ==1)
-        name = 'right';
-    elseif(trial == 2)
-        name = 'ahead';
-    else
-        name= 'top';
-    end
-    title(['Position recognition of the ', name ,' trajectory'])
-    xlabel('x (m)');
-    ylabel('y (m)');
-    zlabel('z (m)');
-
-
-    %draw the infered movement 3D forces
-    name3D2 = figure;
-    for t=1:nbData
-           name3D2(t) = scatter3(y_trial(t + nbData*3), y_trial(nbData*4 + t), y_trial(5*nbData + t), '.b'); hold on;
-    end
-    %name3D2 = visualisation3D(y_trial_Tot{reco{1}}, 6, totalTimeExpexted,1, ':b', name3D2);hold on;
-    %nam4 = visualisation3D(y_trial_Tot{1}, 6, totalTimeTrial(1), 0, [1, 0, 0], nam4);
-
-    i = reco{1};
-    name3D2 = visualisation3D(PSI_z*mu_new, 6, z, 0, '+g', name3D2);
-    name3D2 = visualisation3D(PSI_z*mu_w{i}, 6, z, 0, '.r', name3D2);
-    name3D2 = visualisation3D(PSI_z*(mu_w{i} + 1.96*sqrt(diag(sigma_w{i}))), 6, z, 1, '-.r', name3D2);
-    name3D2 = visualisation3D(PSI_z*(mu_w{i}- 1.96*sqrt(diag(sigma_w{i}))), 6, z, 1, '-.r', name3D2);
-    legend(name3D2([1 (nbData+1) (nbData +2) (nbData +3) ]),'Data known', 'Data we should have', 'Data deducted', 'Learned distribution');
-
-    if(trial ==1)
-        name = 'right';
-    elseif(trial == 2)
-        name = 'ahead';
-    else
-        name= 'top';
-    end
-    title(['Forces recognition of the ', name ,' trajectory'])
-    xlabel('fx (m)');
-    ylabel('fy (m)');
-    zlabel('fz (m)');
-
-    replayRecognition;
+    newmu{cpt} = mu_new;
+    newSigma{cpt} = sigma_new;
+    cpt = cpt+1;
+    %reco{cpt} = [reco{cpt-1}(1),reco{cpt-1}(2),reco{cpt-1}(3)]; %{trajectory recognized, probability, timestep} of the best likelihood
+%     
+%     clear u ;
+%     u = psiTrial*mu_new;
+%     S = psiTrial*sigma_new*psiTrial' + accuracy*eye(size(psiTrial*sigma_new*psiTrial'));
+%     logkike(step) = logLikelihood( y_trial_Tot{trial}', u', S); 
+    clear mu_new sigma_new u psiTrial;
 end
-
+    Drawing;
+%accuracy = accuracy*10;
+%end
+%clear cpt mu_w_coord mu_w_f sigma_w_coord PSI_coor PSI_forces PSI_mean u sigma prob reco mu_n sigma_n y_trial_nbData realAlpha PSI_update ynew K mu_new sigma_new
