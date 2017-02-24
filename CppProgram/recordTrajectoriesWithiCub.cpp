@@ -147,10 +147,7 @@ public:
 		record.open("record.txt", ios::out | ios::trunc); 
         if (!record)  cerr << "Cannot creat the file for recording movements." << endl;
 
-        if (!initCartesian(robot,part,1,1))
-        {
-			return false;
-		}
+        if (!initCartesian(robot,part,1,1)) return false;
         return true;
     }
     

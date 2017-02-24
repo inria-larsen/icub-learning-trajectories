@@ -24,6 +24,8 @@
  * 
  */
 
+/**Difference with V1: delete library client.h and add it in this code directly*/
+
 #include <cmath>
 #include <string>
 #include <algorithm>
@@ -246,7 +248,7 @@ public:
         verbositylevel = verbose; 
         port.open("/ori_record/read");  
         //TODO to verify it is this port that give information about external forces.
-	    yarp.connect("/wholeBodyDynamics/left_arm/ext_ft_sens:o","/ori_record/read", "tcp");//, false);
+	    yarp.connect("/wholeBodyDynamics/left_arm/ext_ft_sens:o","/ori_record/read", "tcp");//, false);      
 
     }
     
@@ -266,8 +268,7 @@ public:
 		record.open("record.txt", ios::out | ios::trunc); 
         if (!record)  cerr << "Cannot creat the file for recording movements." << endl;
 
-        if (!initCartesian(robot,part,1,1))
-          return false;
+        if (!initCartesian(robot,part,1,1)) return false;
         return true;
     }
     
