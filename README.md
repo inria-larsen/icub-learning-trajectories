@@ -1,7 +1,9 @@
 # icub-learning-trajectories
-[under dev] One C++ program allow to record trajectories (forces + end effector's cartesian positions). Then, a matlab program computes the distribution other three kind of trajectories and allows to recognize and to continue a movement when it is initate by the icub's partner.
+[under dev] One C++ program allows recording trajectories (forces + end effector's cartesian positions) from the iCub thanks to an haptic interface (in our case, the Geomagic Touch). The human demonstrates some movements to the robot thanks to the Geomagic, for example moving the arm. From the several demonstrations, a matlab program computes the distribution of the trajectories in the form of a proMP [1]; it is possible to predict the outcome of a movement initiated by the human and continue the movement without human assistance.
 
 If you have some question, remarks etc, send an email to oriane.dermy@inria.fr.
+
+[1] Paraschos, A.; Daniel, C.; Peters, J.; Neumann, G (2013). Probabilistic Movement Primitives, Advances in Neural Information Processing Systems (NIPS), MIT Press. 
 
 ***WARNING: the  ICUB recording program is under developpment, do not launch it now without verify it.***
 
@@ -37,7 +39,6 @@ gazebo -slibgazebo_yarp_clock.so worldPROMPS.sdf
 8. Go back to the matlab windows and follow the instruction.   
 
 
-## Actual development (V2)
+## Current development (V2)
 In this version, we began to implement the code to be launch on the real iCub.   
-We take into account information about external forces.   
-We just need to be able to modify the compliance of the robot arm to finish this work.   
+We take into account information about external forces.     
